@@ -1,0 +1,294 @@
+<h1 id="vitepress-diagrams-plugin">VitePress Diagrams Plugin</h1>
+
+<table>
+  <tbody>
+    <tr>
+      <td><a href="README.md">English</a></td>
+      <td><a href="README.es.md">Español</a></td>
+      <td><a href="README.zh.md">中文</a></td>
+      <td><a href="README.uk.md">Українська</a></td>
+      <td><a href="README.ru.md">Русский</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>A VitePress plugin that adds support for various diagram types using the Kroki service. The plugin automatically converts diagram code blocks into SVG images, caches them locally, and provides a clean, customizable display with optional captions.</p>
+
+<p>Using an external service requires an internet connection during build, but it offers significant advantages over creating an image on the client (huge bundle and performance drop) and over creating an image on the server (complexity - mermaid requires puppeteer for this, for example).</p>
+
+<p>The diagrams are meant to be generated at <strong>DEV time</strong> because:</p>
+
+<ol>
+  <li>The generation process is asynchronous.</li>
+  <li>It’s not 100% reliable (e.g., kroki.io service might be down).</li>
+  <li>The user needs to verify the output.</li>
+</ol>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">vitepress-plugin-diagrams</code> CLI that comes bundled with this package can be used in a CI to check for missing diagrams or outdated ones. There is also a <a href="https://pre-commit.com">pre-commit</a> hook available (see <a href="#pre-commit">pre-commit section</a>).</p>
+</blockquote>
+
+<h2 id="features">Features</h2>
+
+<ul>
+  <li>Supports multiple diagram types (Mermaid, PlantUML, GraphViz, and more)</li>
+  <li>Automatic SVG generation and caching (once generated it’s cached locally until the diagram code changes)</li>
+  <li>Optional diagram captions</li>
+  <li>Customizable output directory and public path</li>
+  <li>Clean, semantic HTML output</li>
+  <li>Use can use any editor to create diagrams (for example <code class="language-plaintext highlighter-rouge">VS Code</code> with <code class="language-plaintext highlighter-rouge">Mermaid</code> extension)</li>
+  <li><strong>Import diagrams from external files</strong> using <code class="language-plaintext highlighter-rouge">@file:</code> syntax</li>
+</ul>
+
+<p><img src="./diag-1.svg" alt="Diagram" /></p>
+
+<h2 id="installation">Installation</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pnpm add <span class="nt">-D</span> vitepress-plugin-diagrams
+</code></pre></div></div>
+
+<details>
+<summary>yarn</summary>
+
+```bash
+yarn add -D vitepress-plugin-diagrams
+```
+</details>
+
+<details>
+<summary>npm</summary>
+
+```bash
+npm install --save-dev vitepress-plugin-diagrams
+```
+</details>
+
+<h2 id="quick-start">Quick Start</h2>
+
+<ol>
+  <li>Add to VitePress config (<code class="language-plaintext highlighter-rouge">.vitepress/config.ts</code>):</li>
+</ol>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">defineConfig</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">vitepress</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">configureDiagramsPlugin</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">vitepress-plugin-diagrams</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nf">defineConfig</span><span class="p">({</span>
+  <span class="na">markdown</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">config</span><span class="p">:</span> <span class="p">(</span><span class="nx">md</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nf">configureDiagramsPlugin</span><span class="p">(</span><span class="nx">md</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">diagramsDir</span><span class="p">:</span> <span class="dl">"</span><span class="s2">docs/public/diagrams</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// Optional: custom directory for SVG files</span>
+        <span class="na">publicPath</span><span class="p">:</span> <span class="dl">"</span><span class="s2">/diagrams</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// Optional: custom public path for images</span>
+        <span class="na">krokiServerUrl</span><span class="p">:</span> <span class="dl">"</span><span class="s2">https://kroki.io</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// Optional: custom Kroki server URL</span>
+        <span class="na">excludedDiagramTypes</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">mermaid</span><span class="dl">"</span><span class="p">],</span> <span class="c1">// Optional: exclude specific diagram types</span>
+      <span class="p">});</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Create diagrams in markdown:</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```mermaid
+graph TD
+    A[Start] --&gt; B{Decision}
+    B --&gt;|Yes| C[OK]
+    B --&gt;|No| D[Cancel]
+```
+&lt;!-- diagram id="1" caption: "System Design Flow" --&gt;
+</code></pre></div></div>
+
+<h2 id="diagram-metadata">Diagram Metadata</h2>
+
+<p>The diagram metadata feature provides additional context and identification. You can add metadata to your diagrams using special HTML comments.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- diagram id="1" caption: "System Design Flow" --&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Assign a unique ID to each diagram to prevent cache bloating (optional, if you do not modify and regenerate diagrams)</li>
+  <li>Add descriptive captions under the diagram (optional)</li>
+</ul>
+
+<p>Note on identifiers:</p>
+
+<ul>
+  <li>If you omit <code class="language-plaintext highlighter-rouge">id</code>, the plugin automatically derives a stable, position-based identifier (<code class="language-plaintext highlighter-rouge">positionId</code>) from the markdown file name and the code block index. This keeps filenames stable across rebuilds unless the diagram moves within the file.</li>
+  <li>If neither <code class="language-plaintext highlighter-rouge">id</code> nor position can be used, the filename falls back to a content hash-only form.</li>
+</ul>
+
+<h2 id="file-imports">File Imports</h2>
+
+<p>You can import diagram definitions from external files using the <code class="language-plaintext highlighter-rouge">@file:</code> syntax. This is useful for:</p>
+
+<ul>
+  <li>Managing complex diagrams in dedicated editors (e.g., BPMN editors, PlantUML IDEs)</li>
+  <li>Reusing diagram definitions across multiple documentation pages</li>
+  <li>Keeping markdown files clean and focused on content</li>
+</ul>
+
+<h3 id="basic-usage">Basic Usage</h3>
+
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">```</span><span class="nl">bpmn
+</span><span class="sb">@file:./diagrams/process.bpmn</span>
+<span class="p">```</span>
+<span class="c">&lt;!-- diagram id="1" caption: "Business Process" --&gt;</span>
+</code></pre></div></div>
+
+<p>The path is resolved <strong>relative to the markdown file</strong> containing the import.</p>
+
+<h3 id="supported-path-types">Supported Path Types</h3>
+
+<ul>
+  <li><strong>Relative paths</strong>: <code class="language-plaintext highlighter-rouge">@file:./diagrams/test.bpmn</code> or <code class="language-plaintext highlighter-rouge">@file:../shared/test.mmd</code></li>
+  <li><strong>Absolute paths</strong>: <code class="language-plaintext highlighter-rouge">@file:/absolute/path/to/diagram.puml</code></li>
+</ul>
+
+<h3 id="configuration-options">Configuration Options</h3>
+
+<p>Control file import behavior with these plugin options:</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">configureDiagramsPlugin</span><span class="p">(</span><span class="nx">md</span><span class="p">,</span> <span class="p">{</span>
+  <span class="c1">// Enable/disable file imports (default: true)</span>
+  <span class="na">enableFileImports</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  
+  <span class="c1">// Restrict imports to specific directories for security (optional)</span>
+  <span class="na">allowedImportDirs</span><span class="p">:</span> <span class="p">[</span>
+    <span class="dl">'</span><span class="s1">./docs/diagrams</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">./shared/diagrams</span><span class="dl">'</span>
+  <span class="p">],</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h3 id="security">Security</h3>
+
+<p>When <code class="language-plaintext highlighter-rouge">allowedImportDirs</code> is specified, only files within those directories can be imported. This prevents accidental or malicious access to sensitive files outside your documentation structure.</p>
+
+<h3 id="error-handling">Error Handling</h3>
+
+<p>If a file cannot be read (missing, permission denied, etc.), an error message will be displayed in place of the diagram:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error loading diagram file: Failed to read file import: ENOENT: no such file or directory...
+</code></pre></div></div>
+
+<h2 id="supported-diagrams">Supported Diagrams</h2>
+
+<p>Mermaid, PlantUML, GraphViz, BlockDiag, BPMN, Bytefield, SeqDiag, ActDiag, NwDiag, PacketDiag, RackDiag, C4 (with PlantUML), D2, DBML, Ditaa, Erd, Excalidraw, Nomnoml, Pikchr, Structurizr, Svgbob, Symbolator, TikZ, UMlet, Vega, Vega-Lite, WaveDrom, WireViz</p>
+
+<p><a href="https://kroki.io/#support">View full list of supported diagrams →</a></p>
+
+<h2 id="configuration">Configuration</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">diagramsDir</code></td>
+      <td><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td><code class="language-plaintext highlighter-rouge">"docs/public/diagrams"</code></td>
+      <td>Directory where SVG files will be stored</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">publicPath</code></td>
+      <td><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td><code class="language-plaintext highlighter-rouge">"/diagrams"</code></td>
+      <td>Public path for accessing the SVG files</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">krokiServerUrl</code></td>
+      <td><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td><code class="language-plaintext highlighter-rouge">"https://kroki.io"</code></td>
+      <td>Kroki server URL for diagram generation</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">excludedDiagramTypes</code></td>
+      <td><code class="language-plaintext highlighter-rouge">DiagramType[]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[]</code></td>
+      <td>Diagram types to exclude; these code blocks render as normal code</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">enableFileImports</code></td>
+      <td><code class="language-plaintext highlighter-rouge">boolean</code></td>
+      <td><code class="language-plaintext highlighter-rouge">true</code></td>
+      <td>Enable/disable file import syntax (@file:)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">allowedImportDirs</code></td>
+      <td><code class="language-plaintext highlighter-rouge">string[]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">undefined</code></td>
+      <td>Restrict file imports to specific directories (security)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="output">Output</h2>
+
+<h2 id="output-structure">Output Structure</h2>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;figure</span> <span class="na">class=</span><span class="s">"vpd-diagram vpd-diagram--[diagramType]"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;img</span> 
+    <span class="na">src=</span><span class="s">"[publicPath]/[diagramType]-[identifier]-[hash].svg"</span> 
+    <span class="na">alt=</span><span class="s">"[diagramType] Diagram"</span> 
+    <span class="na">class=</span><span class="s">"vpd-diagram-image"</span>
+  <span class="nt">/&gt;</span>
+  <span class="nt">&lt;figcaption</span> <span class="na">class=</span><span class="s">"vpd-diagram-caption"</span><span class="nt">&gt;</span>
+    [caption]
+  <span class="nt">&lt;/figcaption&gt;</span>
+<span class="nt">&lt;/figure&gt;</span>
+</code></pre></div></div>
+
+<p>You can customize the <code class="language-plaintext highlighter-rouge">CSS</code> classes to match your theme.</p>
+
+<h3 id="filename-pattern-and-cache-behavior">Filename pattern and cache behavior</h3>
+
+<ul>
+  <li>Filename format varies based on available identifiers:
+    <ul>
+      <li>With explicit <code class="language-plaintext highlighter-rouge">id</code>: <code class="language-plaintext highlighter-rouge">[diagramType]-[id]-[hash].svg</code></li>
+      <li>With position-based identifier: <code class="language-plaintext highlighter-rouge">[diagramType]-[positionId]-[hash].svg</code></li>
+      <li>Without any identifier: <code class="language-plaintext highlighter-rouge">[diagramType]-[hash].svg</code></li>
+    </ul>
+  </li>
+  <li>Old files are cleaned up automatically when regenerating:
+    <ul>
+      <li>For <code class="language-plaintext highlighter-rouge">id</code>, previous files with the same <code class="language-plaintext highlighter-rouge">diagramType</code> and <code class="language-plaintext highlighter-rouge">id</code> are removed.</li>
+      <li>For <code class="language-plaintext highlighter-rouge">positionId</code>, previous files with the same <code class="language-plaintext highlighter-rouge">diagramType</code> and <code class="language-plaintext highlighter-rouge">positionId</code> are removed.</li>
+      <li>Without identifiers, older <code class="language-plaintext highlighter-rouge">[diagramType]-[otherHash].svg</code> files are removed when content changes.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="note">Note</h2>
+
+<p>When updating a diagram, you may see a placeholder image on the browser page. This is normal, because the svg file is loaded asynchronously and may not be displayed immediately. Just refresh the page.</p>
+
+<h2 id="pre-commit">Pre-commit</h2>
+
+<p>Add this to your <code class="language-plaintext highlighter-rouge">.pre-commit-config.yaml</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">repo</span><span class="pi">:</span> <span class="s">https://github.com/vuesence/vitepress-plugin-diagrams</span>
+  <span class="na">rev</span><span class="pi">:</span> <span class="s2">"</span><span class="s">main"</span>
+  <span class="na">hooks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">check-missing-diagrams</span>
+    <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">clean-diagrams</span>
+</code></pre></div></div>
+
+<h2 id="license">License</h2>
+
+<p>MIT</p>
+
+<h2 id="contributing">Contributing</h2>
+
+<p>Contributions are welcome! Before submitting a Pull Request, please open an issue first to discuss proposed changes.</p>
+
+<h2 id="credits">Credits</h2>
+
+<p>This plugin uses the <a href="https://kroki.io/">Kroki</a> service for diagram generation.</p>
