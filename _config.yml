@@ -1,0 +1,9 @@
+theme: jekyll-theme-primer
+plugins:
+  - jekyll-readme-index
+readme_index:
+  enabled: true
+  forward_to: /
+exclude:
+  - demo/assets
+  - demo/diagrams
