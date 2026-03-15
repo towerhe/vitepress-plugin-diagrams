@@ -1,9 +1,0 @@
-theme: jekyll-theme-primer
-exclude:
-  - demo/assets
-  - demo/diagrams
-defaults:
-  - scope:
-      path: "README*.md"
-    values:
-      layout: default
