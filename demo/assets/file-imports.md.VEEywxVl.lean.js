@@ -9,7 +9,7 @@ import{_ as r,c as l,o as n,ae as i,j as a,a as s}from"./chunks/framework.CkhtPn
         if (!isFullscreen) {
           figure.classList.add('vpd-diagram--fullscreen');
         }
-      `},[a("img",{src:"/vitepress-plugin-diagrams/demo/diagrams/bpmn-file-bpmn-1-a7111b72bbeb514ee22ffda108140e1d.svg",alt:"bpmn Diagram",class:"vpd-diagram-image"})],-1),a("h3",{id:"mermaid-from-file",tabindex:"-1"},[s("Mermaid from File "),a("a",{class:"header-anchor",href:"#mermaid-from-file","aria-label":'Permalink to "Mermaid from File"'},"​")],-1),a("figure",{class:"vpd-diagram vpd-diagram--mermaid",onclick:`
+      `},[a("img",{src:"/vitepress-plugin-diagrams/demo/diagrams/bpmn-file-bpmn-1-ad7d0621ad6ddc0244611f63039bfedf.svg",alt:"bpmn Diagram",class:"vpd-diagram-image"})],-1),a("h3",{id:"mermaid-from-file",tabindex:"-1"},[s("Mermaid from File "),a("a",{class:"header-anchor",href:"#mermaid-from-file","aria-label":'Permalink to "Mermaid from File"'},"​")],-1),a("figure",{class:"vpd-diagram vpd-diagram--mermaid",onclick:`
         const figure = this;
         const isFullscreen = figure.classList.contains('vpd-diagram--fullscreen');
 
@@ -20,7 +20,7 @@ import{_ as r,c as l,o as n,ae as i,j as a,a as s}from"./chunks/framework.CkhtPn
         if (!isFullscreen) {
           figure.classList.add('vpd-diagram--fullscreen');
         }
-      `},[a("img",{src:"/vitepress-plugin-diagrams/demo/diagrams/mermaid-file-mermaid-1-d012c134912a313cd94c04dbaed2abb0.svg",alt:"mermaid Diagram",class:"vpd-diagram-image"})],-1),a("h3",{id:"plantuml-from-file",tabindex:"-1"},[s("PlantUML from File "),a("a",{class:"header-anchor",href:"#plantuml-from-file","aria-label":'Permalink to "PlantUML from File"'},"​")],-1),a("figure",{class:"vpd-diagram vpd-diagram--plantuml",onclick:`
+      `},[a("img",{src:"/vitepress-plugin-diagrams/demo/diagrams/mermaid-file-mermaid-1-5928d59e9b2b3a55806544946670d4e0.svg",alt:"mermaid Diagram",class:"vpd-diagram-image"})],-1),a("h3",{id:"plantuml-from-file",tabindex:"-1"},[s("PlantUML from File "),a("a",{class:"header-anchor",href:"#plantuml-from-file","aria-label":'Permalink to "PlantUML from File"'},"​")],-1),a("figure",{class:"vpd-diagram vpd-diagram--plantuml",onclick:`
         const figure = this;
         const isFullscreen = figure.classList.contains('vpd-diagram--fullscreen');
 
@@ -31,4 +31,4 @@ import{_ as r,c as l,o as n,ae as i,j as a,a as s}from"./chunks/framework.CkhtPn
         if (!isFullscreen) {
           figure.classList.add('vpd-diagram--fullscreen');
         }
-      `},[a("img",{src:"/vitepress-plugin-diagrams/demo/diagrams/plantuml-file-plantuml-1-85b568887c1ed2561949896fe588be7b.svg",alt:"plantuml Diagram",class:"vpd-diagram-image"})],-1),i("",18)]))}const f=r(t,[["render",o]]);export{u as __pageData,f as default};
+      `},[a("img",{src:"/vitepress-plugin-diagrams/demo/diagrams/plantuml-file-plantuml-1-44cd27278f5f9189289a1a670175985b.svg",alt:"plantuml Diagram",class:"vpd-diagram-image"})],-1),i("",18)]))}const f=r(t,[["render",o]]);export{u as __pageData,f as default};
